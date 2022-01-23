@@ -27,12 +27,12 @@ for s in ss:
                         #print(c, v1, v2)
                         if 10 <= len(str(v1)) <= 50:
                             if to_Xn(v1, s).count(smb[i]) < 100:
-                                data[str(c).rjust(8, "0")] = (n1, s1, "+", n2, s2, s, i), to_Xn(v1, s).count(smb[i])
+                                data[str(c).rjust(8, "0")] = (n1, s1, "+", n2, s2, s, smb[i]), (n1, s1, "+", n2, s2, n1 ** s1, "+", n2 ** s2, v1, s, v1, to_Xn(v1, s), s, to_Xn(v1, s).count(smb[i])), to_Xn(v1, s).count(smb[i])
                                 c += 1
                                 print(c)
                         if v2 >= 0 and 10 <= len(str(v2)) <= 50:
                             if to_Xn(v2, s).count(smb[i]) < 100:
-                                data[str(c).rjust(8, "0")] = (n1, s1, "-", n2, s2, s, i), to_Xn(v2, s).count(smb[i])
+                                data[str(c).rjust(8, "0")] = (n1, s1, "-", n2, s2, s, smb[i]), (n1, s1, "-", n2, s2, n1 ** s1, "-", n2 ** s2, v2, s, v2, to_Xn(v2, s), s, to_Xn(v2, s).count(smb[i])), to_Xn(v2, s).count(smb[i])
                                 c += 1
                                 print(c)
 with open("00000002.json", "w+") as f:
