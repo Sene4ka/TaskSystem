@@ -47,38 +47,40 @@ class TaskList:
         return c
 
     def form_tasks(self, task_types):
-        try:
-            for i in task_types.keys():
-                soc = socket.socket()
-                soc.connect(("188.134.74.19", 4444))
-                to_send = f"get_data {i}"
-                soc.sendall(to_send.encode())
-                data = soc.recv(1024)
-                data = data.decode().split("|")
-                soc.close()
-                soc = socket.socket()
-                soc.connect(("188.134.74.19", 4444))
-                to_send = f"get_seed {i}:{task_types[i]}"
-                soc.sendall(to_send.encode())
-                data_t = soc.recv(1024)
-                data_t = data_t.decode().split("$")
-                soc.close()
-                for j in data_t:
-                    data_l = j.split("|")
-                    dt = data_l[1].split(";")
-                    task = Task(i, data[0], data[1], data[2], data_l[0], dt, data_l[2])
-                    self.tasks.append(task)
-        except Exception:
-            imsgBox = QtWidgets.QMessageBox()
-            imsgBox.setIcon(QtWidgets.QMessageBox.Information)
-            imsgBox.setText("Произошла непредвиденная ошибка.")
-            imsgBox.setWindowTitle("Ошибка!")
-            imsgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
-            imsgBox.exec()
-
-
-
-
+        #try:
+        for i in task_types.keys():
+            soc = socket.socket()
+            soc.connect(("188.134.74.19", 4444))
+            to_send = f"get_data {i}"
+            soc.sendall(to_send.encode())
+            data = soc.recv(1024)
+            data = data.decode().split("|")
+            soc.close()
+            soc = socket.socket()
+            soc.connect(("188.134.74.19", 4444))
+            to_send = f"get_seed {i}:{task_types[i]}"
+            soc.sendall(to_send.encode())
+            data_t = soc.recv(1024)
+            data_t = data_t.decode().split("$")
+            soc.close()
+            for j in data_t:
+                data_l = j.split("|")
+                dt1 = data_l[1].split(";")
+                dt2 = data_l[2].split(";")
+                print(data, data_l)
+                #print(i, data[0], data[1], data[2], data[3], data_l[0], dt1, dt2, data_l[3])
+                task = Task(i, data[0], data[1], data[2], data[3], data_l[0], dt1, dt2, data_l[3])
+                print(task)
+                self.tasks.append(task)
+        #except Exception:
+            #print(Exception)
+            #print(i, data[0], data[1], data[2], data[3], data_l[0], dt1, dt2, data_l[2])
+            #imsgBox = QtWidgets.QMessageBox()
+            #imsgBox.setIcon(QtWidgets.QMessageBox.Information)
+            #imsgBox.setText("Произошла непредвиденная ошибка.")
+            #imsgBox.setWindowTitle("Ошибка!")
+            #imsgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            #imsgBox.exec()
 
     def on_task_complete(self, task_number, answer=None, check_only=False):
         if check_only:
@@ -95,6 +97,9 @@ class TaskList:
             return self.last_answers[task_number]
         else:
             return ""
+
+    def get_solution(self, n):
+        return self.tasks[n].get_solution()
 
     def save_last_answer(self, task_number, value):
         self.last_answers[task_number] = value

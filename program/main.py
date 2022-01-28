@@ -22,6 +22,9 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
         self.no_name = 0
         self.current_item = -1
         self.setWindowTitle("Генератор задач")
+        self.solution_base_text = "После отправки ответа здесь будет показано решение."
+        self.task_solution.setText(self.solution_base_text)
+        self.task_solution.setReadOnly(True)
         self.tabWidget.setCurrentIndex(1)
         self.tabWidget.setTabEnabled(0, False)
         self.tabWidget.setTabVisible(2, False)
@@ -57,7 +60,9 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
             self.answer_edit.setReadOnly(False)
             self.answer_edit.setText(self.current_task_list.get_last_answer(str(self.current_task_number)))
             self.send_btn.show()
+            self.task_solution.setText(self.solution_base_text)
         else:
+            self.task_solution.setText(self.current_task_list.get_solution(self.current_task_number))
             self.answer_edit.setReadOnly(True)
             self.answer_edit.setText(self.current_task_list.get_last_answer(str(self.current_task_number)))
             self.send_btn.hide()

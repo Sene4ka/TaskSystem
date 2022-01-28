@@ -11,10 +11,10 @@ for i in resolutions:
         mb = 1024 * 1024 * 8 * j
         kb = 1024 * 8 * j
         if 1 <= mb // pix <= 16 and len(str(mb / pix).split(".")[-1]) <= 16:
-            data[str(c).rjust(8, "0")] = (str(res[0]), str(res[1]), str(j), "М"), ("Мега", f"{j} * 1024 * 1024 * 8 = {mb}МБайт.", f"{res[0]} * {res[1]} = {pix} пикселей.", f"{kb} // {pix} = {kb // pix} бит на пиксель.", f"2 ^ {kb // pix} цветов."), str(2 ** (mb // pix))
+            data[str(c).rjust(8, "0")] = (str(res[0]), str(res[1]), str(j), "М"), ("Мега", f"{j} * 1024 * 1024 * 8 = {mb}МБайт.", f"{res[0]} * {res[1]} = {pix} пикселей.", f"{kb} // {pix} = {kb // pix} бит на пиксель.", f"2 ^ {kb // pix} = {2 ** (kb // pix)} цветов."), str(2 ** (mb // pix))
             c += 1
         if 1 <= kb // pix <= 16 and len(str(kb / pix).split(".")[-1]) <= 4:
-            data[str(c).rjust(8, "0")] = (str(res[0]), str(res[1]), str(j), "К"), ("Кило", f"{j} * 1024 * 8 = {kb}КБайт.", f"{res[0]} * {res[1]} = {pix} пикселей.", f"{kb} // {pix} = {kb // pix} бит на пиксель.", f"2 ^ {kb // pix} цветов."), str(2 ** (kb // pix))
+            data[str(c).rjust(8, "0")] = (str(res[0]), str(res[1]), str(j), "К"), ("Кило", f"{j} * 1024 * 8 = {kb}КБайт.", f"{res[0]} * {res[1]} = {pix} пикселей.", f"{kb} // {pix} = {kb // pix} бит на пиксель.", f"2 ^ {kb // pix}  = {2 ** (kb // pix)} цветов."), str(2 ** (kb // pix))
             c += 1
 with open("00000001.json", "w+") as f:
     json.dump(data, f)
