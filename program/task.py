@@ -7,35 +7,43 @@ class Task:
         self.task_id = task_id
         self.seed = seed
         self.task_name = name
-        print("IN_CLASS")
         self.text_data = text_data
-        print("IN_CLASS")
         self.task_text = task_text.format(*self.text_data)
-        print("IN_CLASS")
         self.solution_data = solution_data
-        print("IN_CLASS", solution_text, '\n', solution_data)
         self.task_solution = solution_text.format(*self.solution_data)
-        print("IN_CLASS")
         self.answer = answer
-        print("IN_CLASS")
         self.score = "0"
         self.max_ball = max_ball
         self.completed = False
         self.first_try = True
-        print("IN_CLASS:", self.task_text, self.task_solution)
+        self.user_answer = None
 
+    def set_preferred_parameters(self, user_answer):
+        self.user_answer = user_answer
+        self.first_try = False
+        self.completed = True if self.answer == self.user_answer else False
+        self.score = self.max_ball if self.answer == self.user_answer else self.score
 
     def get_task_id(self):
         return self.task_id
 
     def get_seed(self):
         return self.seed
+    
+    def get_max_ball(self):
+        return self.max_ball
+
+    def get_score(self):
+        return self.score
 
     def get_text(self):
         return self.task_text
     
     def get_answer(self):
         return self.answer
+
+    def get_user_answer(self):
+        return self.user_answer
 
     def get_name(self):
         return self.task_name
@@ -46,6 +54,9 @@ class Task:
     def get_solution(self):
         return self.task_solution
 
+    def get_all_save_data(self):
+        return f"{self.task_id};{self.seed};{self.user_answer}"
+
     def on_task_complete(self, answer=None, check_only=False):
         if check_only:
             return self.completed, self.score, self.answer, self.first_try, False
@@ -54,6 +65,7 @@ class Task:
             if answer == self.answer:
                 self.score = self.max_ball
                 self.completed = True
+            self.user_answer = answer
             return self.completed, self.score, self.answer, self.first_try, True
         else:
             return self.completed, self.score, self.answer, self.first_try, False
