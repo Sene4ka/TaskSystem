@@ -5,7 +5,8 @@ from PyQt5 import QtWidgets
 import datetime
 
 class TaskList:
-    def __init__(self, name):
+    def __init__(self, name, server_data):
+        self.server_data = server_data
         self.name = name
         self.type = ""
         self.tasks = []
@@ -60,7 +61,7 @@ class TaskList:
             for i in task_types.keys():
                 to_send = f"get_data {i}"
                 soc = socket.socket()
-                soc.connect(("188.134.74.19", 4444))
+                soc.connect(self.server_data)
                 soc.sendall(to_send.encode())
                 data = soc.recv(1024)
                 data = data.decode().split("|")
@@ -69,7 +70,7 @@ class TaskList:
                 user_answers = [j[1] for j in task_types[i]]
                 print(seeds)
                 soc = socket.socket()
-                soc.connect(("188.134.74.19", 4444))
+                soc.connect(self.server_data)
                 soc.sendall(f"get_task_data_from_seeds {i}|{';'.join(seeds)}".encode())
                 data_t = soc.recv(1024)
                 soc.close()
@@ -99,14 +100,14 @@ class TaskList:
         try:
             for i in task_types.keys():
                 soc = socket.socket()
-                soc.connect(("188.134.74.19", 4444))
+                soc.connect(self.server_data)
                 to_send = f"get_data {i}"
                 soc.sendall(to_send.encode())
                 data = soc.recv(1024)
                 data = data.decode().split("|")
                 soc.close()
                 soc = socket.socket()
-                soc.connect(("188.134.74.19", 4444))
+                soc.connect(self.server_data)
                 to_send = f"get_seed {i}:{task_types[i]}"
                 soc.sendall(to_send.encode())
                 data_t = soc.recv(1024)

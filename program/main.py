@@ -8,9 +8,10 @@ from account import Account
 
 
 class Program(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self, server_ip, server_port):
         super().__init__()
         self.setupUi(self)
+        self.server_data = (server_ip, server_port)
         self.account = None
         self.user_id = "1"
         self.self_task_lists = []
@@ -263,7 +264,7 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
             c += 1
 
     def create_task_list(self, name, task_types):
-        tl = TaskList(name)
+        tl = TaskList(name, self.server_data)
         try:
             tl.form_tasks(task_types)
         except Exception:
@@ -275,8 +276,8 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
             self.task_select.clear()
             self.task_select_items = {}
             soc = socket.socket()
-            soc.connect(("188.134.74.19", 4444))
-            to_send = f"get_name_by_number"
+            soc.connect(self.server_data)
+            to_send = "get_name_by_number"
             soc.sendall(to_send.encode())
             data = soc.recv(1024)
             data = data.decode().split("$")
@@ -299,13 +300,13 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
         data = self.current_task_list.get_all_save_data()
         print(data)
         soc = socket.socket()
-        soc.connect(("188.134.74.19", 4444))
+        soc.connect(self.server_data)
         soc.sendall(f"save_data||{self.user_id}||{data}".encode())
         soc.close()
 
     def load_task_history_names(self):
         soc = socket.socket()
-        soc.connect(("188.134.74.19", 4444))
+        soc.connect(self.server_data)
         soc.sendall(f"get_saved_tl_names {self.user_id}".encode())
         dt = soc.recv(1024)
         dt = dt.decode()
@@ -317,10 +318,10 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.task_history.addItem(f"{name}({add_info}) {date}")
     
     def load_task_from_history(self, item):
-        tl = TaskList("")
+        tl = TaskList("", self.server_data)
         soc = socket.socket()
         tx = self.task_history.row(item)
-        soc.connect(("188.134.74.19", 4444))
+        soc.connect(self.server_data)
         soc.sendall(f"get_saved_tl_data|{self.user_id}&{tx}".encode())
         dt = soc.recv(1024)
         dt = dt.decode()
@@ -391,7 +392,7 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    window = Program()
+    window = Program("188.134.74.19", 4444)
     window.show()
     app.exec_()
 
