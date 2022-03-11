@@ -25,17 +25,20 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
         self.allowed_numbers = "0123456789"
         self.setWindowTitle("Генератор задач")
         self.solution_base_text = "После отправки ответа здесь будет показано решение."
+        self.is_psswd_seen = False
+        self.psswd_text = ""
         self.task_solution.setText(self.solution_base_text)
         self.task_solution.setReadOnly(True)
         self.tabWidget.setTabEnabled(0, False)
         self.tabWidget.setTabVisible(2, False)
         self.tabWidget.setTabEnabled(3, False)
-        self.tabWidget.setCurrentIndex(5)
+        self.tabWidget.setCurrentIndex(4)
         #self.task_history.setCurrentRow(1)
         self.task_choose.activated.connect(lambda: self.choose_task())
         self.send_btn.clicked.connect(lambda: self.check_answer())
         self.end_work.clicked.connect(lambda: self.end_task())
         self.self_tl.itemClicked.connect(self.on_self_task_list_choice)
+        self.teacher_tl.itemClicked.connect(self.on_teacher_task_choose)
         self.tabWidget.currentChanged.connect(self.update_lists)
         self.add_task.clicked.connect(lambda: self.go_to_task_list_creation())
         self.cancel.clicked.connect(lambda: self.cancel_pressed())
@@ -47,10 +50,13 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
         self.answer_edit.textChanged.connect(self.check_answer_field)
         self.login_btn.clicked.connect(self.login_func)
         self.update_history.clicked.connect(self.update_history_fuction)
+        self.password_field.textChanged.connect(self.psswd_change)
+        self.clr_btn.clicked.connect(self.clr_psswd)
+        self.see_btn.clicked.connect(self.see_psswd)
 
     def login_func(self):
         ulogin = self.login_field.text()
-        upassword = self.password_field.text()
+        upassword = self.psswd_text
         encoded_ulogin = encoding(ulogin, "0")
         encoded_upassword = encoding(upassword, "0")
         soc = socket.socket()
@@ -59,13 +65,13 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
         result, name, uclass= soc.recv(1024).decode().split("|")
         soc.close()
         if result == "ok":
-            print(1)
-            self.account = Account(ulogin)
+            self.account = Account(ulogin, self.server_data)
             self.tabWidget.setTabEnabled(3, True)
             self.tabWidget.setCurrentIndex(3)
             self.uname.setText(name)
             self.ulogin.setText(ulogin)
-            self.tabWidget.setTabVisible(5, False)
+            self.uclass.setText(uclass)
+            self.tabWidget.setTabVisible(4, False)
         elif result == "incorrect":
             imsgBox = QtWidgets.QMessageBox()
             imsgBox.setIcon(QtWidgets.QMessageBox.Information)
@@ -75,24 +81,62 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
             returnValue = imsgBox.exec()
             self.password_field.clear()
 
+    def psswd_change(self):
+        if self.is_psswd_seen:
+            self.psswd_text = self.password_field.text()
+        else:
+            if len(self.password_field.text()) < len(self.psswd_text):
+                self.password_field.setText("*" * len(self.psswd_text))
+            else:
+                txt = self.password_field.text()
+                for i in range(len(txt)):
+                    if txt[i] != "*":
+                        self.psswd_text = self.psswd_text[:i] + txt[i] + self.psswd_text[i:]
+                self.password_field.setText("*" * len(self.password_field.text()))
+
+    def clr_psswd(self):
+        self.psswd_text = ""
+        self.password_field.clear()
+
+    def see_psswd(self):
+        self.is_psswd_seen = not self.is_psswd_seen
+        if self.is_psswd_seen:
+            self.password_field.setText(self.psswd_text)
+        else:
+            self.password_field.setText("*" * len(self.psswd_text))
+    
     def refresh_teacher_tasks(self):
         data = self.account.get_user_tasks_names().split("|")
         self.teacher_tl.clear()
         for i in data:
-            self.teacher_tl.addItem(i)
+            if i != "":
+                self.teacher_tl.addItem(i)
 
     def on_teacher_task_choose(self, item):
-        index = self.teacher_tl.indexFromItem(item)
-        data = self.account.get_task_by_index(index).split("|")
-        sl = {}
-        for i in data:
-            dts = i.split(";")
-            i = dts[0]
-            sl[i] = dts[1:]
-        tl = TaskList(item.text(), self.server_data)
-        tl.form_tasks(sl)
+        qmsgBox = QtWidgets.QMessageBox()
+        qmsgBox.setIcon(QtWidgets.QMessageBox.Question)
+        if self.current_task_list_number not in [-1, -3]:
+            qmsgBox.setText("Вы уверены что хотите начать эту работу?\nЭто завершит вашу текущую работу!")
+        elif self.current_task_list_number == -3:
+            qmsgBox.setText("Вы уверены что хотите начать эту работу?\nЭто завершит просмотр задания!")
+        else:
+            qmsgBox.setText("Вы уверены что хотите начать эту работу?")
+        qmsgBox.setWindowTitle("Подтверждение")
+        qmsgBox.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        returnValue = qmsgBox.exec()
+        if returnValue == QtWidgets.QMessageBox.Yes:
+            text = item.text()
+            data = self.account.get_task_by_name(text).split("|")
+            sl = {}
+            for i in data:
+                dts = i.split(":")
+                i = dts[0]
+                sl[i] = dts[1]
+            tl = TaskList(item.text(), self.server_data)
+            tl.form_tasks(sl)
+            tl.set_type("user")
+            self.choose_task_list(is_user=True, tl=tl)
         
-
     def check_tl_text(self):
         text = list(self.tl_name.text())
         n_text = []
@@ -144,7 +188,7 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
             self.self_tl.clear()
             self.teacher_tl.clear()
             self.form_self_task_lists()
-            #self.refresh_teacher_tasks()
+            self.refresh_teacher_tasks()
         elif index == 3:
             self.task_history.clear()
             self.load_task_history_names()
@@ -200,7 +244,6 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
         self.task_select.currentItem().setText(f"{' '.join(self.task_select.currentItem().text().split()[:-1])}  {self.task_select_items[self.task_select.currentItem().text().split('.')[0]][1]}")
             
     def remove_item(self):
-        print(3)
         self.task_select_items[self.task_select.currentItem().text().split(".")[0]][1] -= 1
         self.task_select.currentItem().setText(f"{' '.join(self.task_select.currentItem().text().split()[:-1])}  {self.task_select_items[self.task_select.currentItem().text().split('.')[0]][1]}")
 
@@ -246,7 +289,7 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
             returnValue = qmsgBox.exec()
             if returnValue == QtWidgets.QMessageBox.Yes:
                 self.choose_task_list(index, is_self=True)
-    
+
     def choose_task(self):
         number = self.task_choose.currentIndex()
         self.current_task_list.save_last_answer(str(self.current_task_number), self.answer_edit.text())
@@ -273,11 +316,13 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
     def choose_task_list(self, index=-1, is_self=False, is_user=False, is_from_history=False, tl=None):
         if is_self:
             self.current_task_list = self.self_task_lists[index]
+            self.current_task_list_number = index
         elif is_user:
-            self.current_task_list = self.user_task_lists[index]
+            self.current_task_list = tl
+            self.current_task_list_number = -2
         elif is_from_history:
             self.current_task_list = tl
-        self.current_task_list_number = index
+            self.current_task_list_number = -3
         self.current_task_list.on_run()
         self.form_qcombobox()
         self.tabWidget.setTabEnabled(0, True)
@@ -366,7 +411,7 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
     def load_task_from_history(self, item):
         qmsgBox = QtWidgets.QMessageBox()
         qmsgBox.setIcon(QtWidgets.QMessageBox.Question)
-        if not self.current_task_list.is_from_history_check():
+        if self.current_task_list != -1:
             qmsgBox.setText("Вы уверены что хотите открыть эту работу из истории заданий?\nЭто действие завершит вашу текущую работу!")
         else:
             qmsgBox.setText("Вы уверены что хотите открыть эту работу из истории заданий?")
@@ -395,6 +440,7 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
             self.clear_all()
             #try:
             tl.load_tasks(sl)
+            print(tl)
             self.choose_task_list(is_from_history=True, tl=tl)
             #except Exception:
                 #pass
@@ -432,13 +478,17 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
         self.send_btn.hide()
         self.label_tmp_1.hide()
         print(self.self_task_lists)
-        if self.current_task_list_number != -1:
+        if self.current_task_list_number == -2:
+            print(1)
+            if self.account:
+                self.save_task_on_server()
+                self.account.delete_task_by_name(self.current_task_list.get_name())
+        elif self.current_task_list_number > -1:
             self.current_task_list.on_complete()
             if self.account:
                 self.save_task_on_server()
-            if self.current_task_list.get_type() == "self":
-                del self.self_task_lists[self.current_task_list_number]
-        print(self.self_task_lists)
+            del self.self_task_lists[self.current_task_list_number]
+        #print(self.self_task_lists)
         self.current_task_list = None
         self.current_task_number = -1
         self.current_task_list_number = -1

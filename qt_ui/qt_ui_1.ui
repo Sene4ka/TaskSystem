@@ -54,7 +54,7 @@
        <set>Qt::ImhNone</set>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="task">
        <attribute name="title">
@@ -540,7 +540,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>10</x>
           <y>102</y>
-          <width>271</width>
+          <width>681</width>
           <height>41</height>
          </rect>
         </property>
@@ -607,7 +607,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>70</x>
           <y>20</y>
-          <width>741</width>
+          <width>571</width>
           <height>31</height>
          </rect>
         </property>
@@ -628,6 +628,47 @@ p, li { white-space: pre-wrap; }
           <width>751</width>
           <height>31</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="class_tmp">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>20</y>
+          <width>71</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Класс:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="uclass">
+        <property name="geometry">
+         <rect>
+          <x>720</x>
+          <y>20</y>
+          <width>101</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
         </property>
         <property name="text">
          <string/>
@@ -743,7 +784,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>220</x>
           <y>320</y>
-          <width>411</width>
+          <width>331</width>
           <height>31</height>
          </rect>
         </property>
@@ -755,6 +796,32 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="see_btn">
+        <property name="geometry">
+         <rect>
+          <x>560</x>
+          <y>320</y>
+          <width>31</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>O</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="clr_btn">
+        <property name="geometry">
+         <rect>
+          <x>600</x>
+          <y>320</y>
+          <width>31</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>X</string>
         </property>
        </widget>
       </widget>

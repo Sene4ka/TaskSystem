@@ -10,6 +10,8 @@ class TaskList:
         self.name = name
         self.type = ""
         self.tasks = []
+        self.mark = 1
+        self.marks_edges = [0.2, 0.4, 0.6, 0.8]
         self.last_answers = {}
         self.completed = False
         self.status = "Не выполнено"
@@ -167,10 +169,21 @@ class TaskList:
             mxb += int(i.get_max_ball())
             if i.get_max_ball == i.get_score():
                 amc += 1
-        add_info = f"Выполнено: {amc}/{at}, Баллы: {b}/{mxb}, Оценка:"
+        dole = b / mxb
+        for i in self.marks_edges:
+            if dole > i:
+                self.mark += 1
+        add_info = f"Выполнено: {amc}/{at}, Баллы: {b}/{mxb}, Оценка: {str(self.mark)}"
         date = datetime.datetime.now()
         date = date.strftime("%m/%d/%Y %H:%M")
         return f"{self.name}&{'|'.join(rdata)}&{add_info}&{date}"
+
+    def send_mark_to_server(self):
+        #soc = socket.socket()
+        #soc.connect(())
+        #soc.sendall(to_send.encode())
+        #soc.close()
+        pass
 
     def get_solution(self, n):
         return self.tasks[n].get_solution()

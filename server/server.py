@@ -28,11 +28,13 @@ async def reciver(con):
             elif "give_task" == data_d.split()[0]:
                 await give_task(con, data_d.split())
             elif "get_user_tasks_names" == data_d.split()[0]:
-                await give_task(con, data_d.split())
-            elif "get_teacher_task_by_index" == data_d.split()[0]:
-                await give_task(con, data_d.split())
+                await get_user_tasks_names(con, data_d.split()[1])
+            elif "get_teacher_task_by_name" == data_d.split()[0]:
+                await get_teacher_task_by_name(con, data_d.split()[1])
             elif "system_login" == data_d.split(" ")[0]:
                 await system_login(con, data_d.split(" ")[1])
+            elif "delete_task" == data_d.split(" ")[0]:
+                await delete_task(con, data_d.split(" ")[1])
     except Exception:
         print("Exception:", con)
 
@@ -76,6 +78,15 @@ async def give_task(con, data):
     if data[1] not in tasks:
         tasks[data[1]] = []
     tasks[data[1]].append([name, data[2]])
+    json.dump(tasks, open("json_data/gived_tasks.json", "w"))
+
+async def delete_task(con, data):
+    uid, name = data.split("|")
+    tasks = json.load(open("json_data/gived_tasks.json"))
+    for i in range(len(tasks[uid])):
+        if tasks[uid][i][0] == name:
+            del tasks[uid][i]
+            break
     json.dump(tasks, open("json_data/gived_tasks.json", "w"))
 
 async def save_data(con, data):
@@ -136,20 +147,31 @@ async def get_task_data_from_seeds(con, data):
     #print(to_send)
     con.sendall("|".join(to_send).encode())
 
-async def get_teacher_task_by_index(con, data):
-    uid, index = data.split("|")
+async def get_teacher_task_by_name(con, data):
+    uid, name = data.split("|")
     tasks = json.load(open("json_data/gived_tasks.json"))
-    to_send = tasks[uid][index][1]
+    to_send = ""
+    for i in tasks[uid]:
+        if i[0] == name:
+            to_send = i[1]
+            break
     con.sendall(to_send.encode())
 
 async def get_user_tasks_names(con, uid):
     tasks = json.load(open("json_data/gived_tasks.json"))
-    to_send = []
-    tasksl = tasks[uid]
-    for i in tasksl:
-        to_send.append(i[0])
-    con.sendall("|".join(to_send).encode())
-        
+    if uid in tasks.keys():
+        to_send = []
+        print(tasks[uid])
+        tasks_k = tasks[uid]
+        for i in tasks_k:
+            to_send.append(i[0])
+        if len(to_send) != 0:
+            con.sendall("|".join(to_send).encode())
+        else:
+            con.sendall("nothing_found".encode())
+    else:
+        con.sendall("nothing_found".encode())
+           
 async def system_login(con, encoded_data):
     #print(encoded_data)
     encoded_login, encoded_password = encoded_data.split("|")
@@ -161,8 +183,19 @@ async def system_login(con, encoded_data):
     soc.close()
     con.sendall(f"{result}|{name[2]}|{name[1]}".encode())
     #print(f"{result}|{name[2]}|{name[1]}")
-    
 
+uid = "01"
+data = "00000001:1"
+date = datetime.datetime.now()
+date = date.strftime("%m/%d/%Y_%H:%M")
+name = f"Задание_от_{date}"
+tasks = json.load(open("json_data/gived_tasks.json"))
+if data[1] not in tasks:
+    tasks[uid] = []
+if len(tasks[uid]) == 0:
+    tasks[uid].append([name, data])
+json.dump(tasks, open("json_data/gived_tasks.json", "w"))
+sp = []
 soc = socket.socket()
 soc.bind(("192.168.0.104", 4444))
 soc.listen()
