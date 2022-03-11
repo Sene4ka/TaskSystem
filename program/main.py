@@ -188,7 +188,8 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
             self.self_tl.clear()
             self.teacher_tl.clear()
             self.form_self_task_lists()
-            self.refresh_teacher_tasks()
+            if self.account:
+                self.refresh_teacher_tasks()
         elif index == 3:
             self.task_history.clear()
             self.load_task_history_names()

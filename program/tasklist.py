@@ -105,14 +105,14 @@ class TaskList:
                 soc.connect(self.server_data)
                 to_send = f"get_data {i}"
                 soc.sendall(to_send.encode())
-                data = soc.recv(1024)
+                data = soc.recv(2048)
                 data = data.decode().split("|")
                 soc.close()
                 soc = socket.socket()
                 soc.connect(self.server_data)
                 to_send = f"get_seed {i}:{task_types[i]}"
                 soc.sendall(to_send.encode())
-                data_t = soc.recv(1024)
+                data_t = soc.recv(2048)
                 data_t = data_t.decode().split("$")
                 soc.close()
                 for j in data_t:
@@ -120,12 +120,9 @@ class TaskList:
                     dt1 = data_l[1].split(";")
                     dt2 = data_l[2].split(";")
                     #print(data, data_l)
-                    #print(i, data[0], data[1], data[2], data[3], data_l[0], dt1, dt2, data_l[3])
                     task = Task(i, data[0], data[1], data[2], data[3], data_l[0], dt1, dt2, data_l[3])
-                    #print(task)
                     self.tasks.append(task)
-        except Exception:
-            #print(Exception)
+        except Exception as e:
             #print(i, data[0], data[1], data[2], data[3], data_l[0], dt1, dt2, data_l[2])
             imsgBox = QtWidgets.QMessageBox()
             imsgBox.setIcon(QtWidgets.QMessageBox.Information)
