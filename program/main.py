@@ -114,28 +114,36 @@ class Program(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def on_teacher_task_choose(self, item):
         qmsgBox = QtWidgets.QMessageBox()
-        qmsgBox.setIcon(QtWidgets.QMessageBox.Question)
-        if self.current_task_list_number not in [-1, -3]:
-            qmsgBox.setText("Вы уверены что хотите начать эту работу?\nЭто завершит вашу текущую работу!")
-        elif self.current_task_list_number == -3:
-            qmsgBox.setText("Вы уверены что хотите начать эту работу?\nЭто завершит просмотр задания!")
+        name_identity = self.current_task_list.get_name() == item.text() if self.current_task_list else False
+        if name_identity:
+            qmsgBox.setText("Эта работа выполняется в данное время!")
+            qmsgBox.setIcon(QtWidgets.QMessageBox.Information)
+            qmsgBox.setWindowTitle("Уведомление")
+            qmsgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            returnValue = qmsgBox.exec()
         else:
-            qmsgBox.setText("Вы уверены что хотите начать эту работу?")
-        qmsgBox.setWindowTitle("Подтверждение")
-        qmsgBox.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-        returnValue = qmsgBox.exec()
-        if returnValue == QtWidgets.QMessageBox.Yes:
-            text = item.text()
-            data = self.account.get_task_by_name(text).split("|")
-            sl = {}
-            for i in data:
-                dts = i.split(":")
-                i = dts[0]
-                sl[i] = dts[1]
-            tl = TaskList(item.text(), self.server_data)
-            tl.form_tasks(sl)
-            tl.set_type("user")
-            self.choose_task_list(is_user=True, tl=tl)
+            qmsgBox.setIcon(QtWidgets.QMessageBox.Question)
+            if self.current_task_list_number not in [-1, -3]:
+                qmsgBox.setText("Вы уверены что хотите начать эту работу?\nЭто завершит вашу текущую работу!")
+            elif self.current_task_list_number == -3:
+                qmsgBox.setText("Вы уверены что хотите начать эту работу?\nЭто завершит просмотр задания!")
+            elif self.current_task_list_number == -1:
+                qmsgBox.setText("Вы уверены что хотите начать эту работу?")
+            qmsgBox.setWindowTitle("Подтверждение")
+            qmsgBox.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            returnValue = qmsgBox.exec()
+            if returnValue == QtWidgets.QMessageBox.Yes:
+                text = item.text()
+                data = self.account.get_task_by_name(text).split("|")
+                sl = {}
+                for i in data:
+                    dts = i.split(":")
+                    i = dts[0]
+                    sl[i] = dts[1]
+                tl = TaskList(item.text(), self.server_data)
+                tl.form_tasks(sl)
+                tl.set_type("user")
+                self.choose_task_list(is_user=True, tl=tl)
         
     def check_tl_text(self):
         text = list(self.tl_name.text())
