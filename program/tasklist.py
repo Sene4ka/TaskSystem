@@ -65,7 +65,7 @@ class TaskList:
                 soc = socket.socket()
                 soc.connect(self.server_data)
                 soc.sendall(to_send.encode())
-                data = soc.recv(1024)
+                data = soc.recv(2048)
                 data = data.decode().split("|")
                 soc.close()
                 seeds = [j[0] for j in task_types[i]]
@@ -74,7 +74,7 @@ class TaskList:
                 soc = socket.socket()
                 soc.connect(self.server_data)
                 soc.sendall(f"get_task_data_from_seeds {i}|{';'.join(seeds)}".encode())
-                data_t = soc.recv(1024)
+                data_t = soc.recv(2048)
                 soc.close()
                 data_t = data_t.decode().split("|")
                 for j in range(len(data_t)):
