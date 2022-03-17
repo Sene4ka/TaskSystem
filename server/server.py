@@ -184,8 +184,8 @@ async def system_login(con, encoded_data):
     con.sendall(f"{result}|{name[2]}|{name[1]}".encode())
     #print(f"{result}|{name[2]}|{name[1]}")
 
-uid = "sene4ka.abrosimov@yandex.ru"
-data = "00000001:1|00000002:1|00000003:1|00000004:1|00000005:1"
+uid = "01"
+data = "00000001:1"
 date = datetime.datetime.now()
 date = date.strftime("%m/%d/%Y_%H:%M")
 name = f"Задание_от_{date}"
