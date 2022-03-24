@@ -184,18 +184,18 @@ async def system_login(con, encoded_data):
     con.sendall(f"{result}|{name[2]}|{name[1]}".encode())
     #print(f"{result}|{name[2]}|{name[1]}")
 
-uid = "01"
-data = "00000001:1"
-date = datetime.datetime.now()
-date = date.strftime("%m/%d/%Y_%H:%M")
-name = f"Задание_от_{date}"
-tasks = json.load(open("json_data/gived_tasks.json"))
-if data[1] not in tasks:
-    tasks[uid] = []
-if len(tasks[uid]) == 0:
-    tasks[uid].append([name, data])
-json.dump(tasks, open("json_data/gived_tasks.json", "w"))
-sp = []
+#uid = "01"
+#data = "00000001:1"
+#date = datetime.datetime.now()
+#date = date.strftime("%m/%d/%Y_%H:%M")
+#name = f"Задание_от_{date}"
+#tasks = json.load(open("json_data/gived_tasks.json"))
+#if data[1] not in tasks:
+    #tasks[uid] = []
+#if len(tasks[uid]) == 0:
+    #tasks[uid].append([name, data])
+#json.dump(tasks, open("json_data/gived_tasks.json", "w"))
+#sp = []
 soc = socket.socket()
 soc.bind(("192.168.0.104", 4444))
 soc.listen()
